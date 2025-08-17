@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/tts_request.dart';
 import '../../data/models/tts_response.dart';
+import '../../data/models/model_status.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
+import '../../domain/repositories/tts_repository.dart';
 import 'repository_providers.dart';
 import 'model_providers.dart';
 
@@ -46,11 +48,15 @@ class TTSPlaybackNotifier extends StateNotifier<PlaybackState> {
       if (!isLoaded) {
         // Try to initialize with default model path
         final defaultModel = await _ref.read(defaultModelProvider.future);
-        final modelStatus = await _ref
-            .read(modelStatusProvider(defaultModel.id).notifier)
-            .future;
+        final modelStatusValue = _ref
+            .read(modelStatusProvider(defaultModel.id));
         
-        if (modelStatus.modelPath != null) {
+        final modelStatus = modelStatusValue.maybeWhen(
+          data: (status) => status,
+          orElse: () => null,
+        );
+        
+        if (modelStatus != null && modelStatus.modelPath != null) {
           await _repository.initializeTTS(modelStatus.modelPath!);
         } else {
           throw Exception('모델이 설치되지 않았습니다');
