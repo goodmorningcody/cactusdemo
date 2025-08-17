@@ -20,7 +20,7 @@ final modelRepositoryProvider = Provider<ModelRepository>((ref) {
 
 // TTS Repository Provider
 final ttsRepositoryProvider = Provider<TTSRepository>((ref) {
-  final ttsService = ref.watch(mockTTSServiceProvider);
+  final ttsService = ref.watch(ttsServiceProvider);
   final audioPlayerService = ref.watch(audioPlayerServiceProvider);
   
   final repository = TTSRepositoryImpl(

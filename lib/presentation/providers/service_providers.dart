@@ -6,6 +6,8 @@ import '../../data/services/local/file_service.dart';
 import '../../data/services/local/preferences_service.dart';
 import '../../data/services/tts/audio_player_service.dart';
 import '../../data/services/tts/mock_tts_service.dart';
+import '../../data/services/tts/cactus_tts_service.dart';
+import '../../domain/services/tts_service_interface.dart';
 
 // Dio Client Provider
 final dioProvider = Provider<Dio>((ref) {
@@ -46,7 +48,7 @@ final audioPlayerServiceProvider = Provider<AudioPlayerService>((ref) {
   return service;
 });
 
-// Mock TTS Service Provider
+// Mock TTS Service Provider (for testing)
 final mockTTSServiceProvider = Provider<MockTTSService>((ref) {
   final service = MockTTSService();
   
@@ -55,4 +57,22 @@ final mockTTSServiceProvider = Provider<MockTTSService>((ref) {
   });
   
   return service;
+});
+
+// Cactus TTS Service Provider (production)
+final cactusTTSServiceProvider = Provider<CactusTTSService>((ref) {
+  final service = CactusTTSService();
+  
+  ref.onDispose(() {
+    service.dispose();
+  });
+  
+  return service;
+});
+
+// TTS Service Provider (uses Cactus in production, can switch to mock for testing)
+final ttsServiceProvider = Provider<TTSServiceInterface>((ref) {
+  // Use Cactus TTS for production
+  // Change to mockTTSServiceProvider for testing without the actual model
+  return ref.watch(cactusTTSServiceProvider);
 });

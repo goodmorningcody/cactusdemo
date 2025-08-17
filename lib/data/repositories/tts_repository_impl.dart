@@ -1,17 +1,17 @@
 import 'dart:typed_data';
 import '../../core/utils/logger.dart';
 import '../../domain/repositories/tts_repository.dart';
+import '../../domain/services/tts_service_interface.dart';
 import '../models/tts_request.dart';
 import '../models/tts_response.dart';
 import '../services/tts/audio_player_service.dart';
-import '../services/tts/mock_tts_service.dart';
 
 class TTSRepositoryImpl implements TTSRepository {
-  final MockTTSService _ttsService;
+  final TTSServiceInterface _ttsService;
   final AudioPlayerService _audioPlayerService;
 
   TTSRepositoryImpl({
-    required MockTTSService ttsService,
+    required TTSServiceInterface ttsService,
     required AudioPlayerService audioPlayerService,
   })  : _ttsService = ttsService,
         _audioPlayerService = audioPlayerService;
