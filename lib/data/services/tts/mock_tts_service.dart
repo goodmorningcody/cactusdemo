@@ -8,7 +8,6 @@ import '../../models/tts_response.dart';
 // This will be replaced with actual Cactus TTS implementation
 class MockTTSService {
   bool _isInitialized = false;
-  String? _modelPath;
 
   Future<void> initialize(String modelPath) async {
     Logger.info('Initializing Mock TTS with model: $modelPath');
@@ -16,7 +15,6 @@ class MockTTSService {
     // Simulate initialization delay
     await Future.delayed(const Duration(seconds: 2));
     
-    _modelPath = modelPath;
     _isInitialized = true;
     
     Logger.success('Mock TTS initialized successfully');
@@ -34,8 +32,7 @@ class MockTTSService {
     await Future.delayed(Duration(milliseconds: processingTime));
     
     // Generate mock audio data
-    final random = Random();
-    final sampleRate = 16000;
+    const sampleRate = 16000;
     final duration = request.text.length * 100; // ms per character
     final samples = (sampleRate * duration / 1000).round();
     
@@ -71,7 +68,6 @@ class MockTTSService {
 
   void dispose() {
     _isInitialized = false;
-    _modelPath = null;
     Logger.info('Mock TTS service disposed');
   }
 }

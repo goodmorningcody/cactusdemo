@@ -128,16 +128,16 @@ class ModelManagementScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             _buildHelpItem(
               context,
-              Icons.download,
-              '모델 다운로드',
-              '처음 사용 시 TTS 모델을 다운로드해야 합니다. WiFi 연결을 권장합니다.',
+              Icons.check_circle,
+              '모델 포함',
+              'TTS 모델이 앱에 포함되어 있어 별도 다운로드가 필요하지 않습니다.',
             ),
             const SizedBox(height: 8),
             _buildHelpItem(
               context,
               Icons.storage,
               '저장 공간',
-              '모델 파일은 약 2GB의 저장 공간이 필요합니다.',
+              '모델 파일은 약 385MB의 저장 공간을 사용합니다.',
             ),
             const SizedBox(height: 8),
             _buildHelpItem(

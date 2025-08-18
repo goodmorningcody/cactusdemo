@@ -5,8 +5,6 @@ import '../../core/constants/app_constants.dart';
 import '../../data/models/model_status.dart';
 import '../../data/models/tts_model.dart';
 import '../providers/model_providers.dart';
-import '../providers/repository_providers.dart';
-
 class ModelStatusWidget extends ConsumerWidget {
   final TTSModel model;
 
@@ -113,18 +111,28 @@ class ModelStatusWidget extends ConsumerWidget {
         return Column(
           children: [
             const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              height: AppConstants.buttonHeight,
-              child: ElevatedButton.icon(
-                onPressed: () => _startDownload(ref),
-                icon: const Icon(Icons.download),
-                label: const Text('모델 다운로드'),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius / 2),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '모델이 앱에 포함되어 있습니다.\n초기화를 진행해주세요.',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -134,16 +142,9 @@ class ModelStatusWidget extends ConsumerWidget {
         return Column(
           children: [
             const SizedBox(height: 8),
-            const Text('다운로드가 진행 중입니다...'),
+            const Text('모델을 초기화하는 중입니다...'),
             const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: () => _cancelDownload(ref),
-              icon: const Icon(Icons.cancel),
-              label: const Text('다운로드 취소'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-            ),
+            const CircularProgressIndicator(),
           ],
         );
         
@@ -177,12 +178,28 @@ class ModelStatusWidget extends ConsumerWidget {
                 ),
               ),
             const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: () => _showDeleteDialog(context, ref),
-              icon: const Icon(Icons.delete_outline),
-              label: const Text('모델 삭제'),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '모델이 앱에 포함되어 있습니다',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -253,49 +270,9 @@ class ModelStatusWidget extends ConsumerWidget {
     );
   }
 
-  void _startDownload(WidgetRef ref) {
-    ref.read(downloadProgressProvider.notifier).startDownload(model);
-  }
-
-  void _cancelDownload(WidgetRef ref) {
-    ref.read(downloadProgressProvider.notifier).cancelDownload();
-  }
 
   void _retry(WidgetRef ref) {
     ref.read(modelStatusProvider(model.id).notifier).refresh();
   }
 
-  void _showDeleteDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('모델 삭제'),
-        content: const Text(
-          'OuteTTS 모델을 삭제하시겠습니까?\n다시 사용하려면 재다운로드가 필요합니다.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deleteModel(ref);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _deleteModel(WidgetRef ref) async {
-    final repository = ref.read(modelRepositoryProvider);
-    await repository.deleteModel(model.id);
-    ref.read(modelStatusProvider(model.id).notifier).refresh();
-  }
 }

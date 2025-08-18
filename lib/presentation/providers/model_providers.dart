@@ -4,7 +4,6 @@ import '../../data/models/model_status.dart';
 import '../../data/models/tts_model.dart';
 import '../../core/utils/logger.dart';
 import '../../domain/repositories/model_repository.dart';
-import '../../data/services/local/file_service.dart';
 import 'repository_providers.dart';
 import 'service_providers.dart';
 

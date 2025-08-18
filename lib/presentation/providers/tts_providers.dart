@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/tts_request.dart';
 import '../../data/models/tts_response.dart';
-import '../../data/models/model_status.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
 import '../../domain/repositories/tts_repository.dart';

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../data/models/model_status.dart';
 import '../../../routes/app_router.dart';
-import '../../providers/tts_providers.dart';
 import '../../providers/model_providers.dart';
 import '../../widgets/text_input_widget.dart';
 import '../../widgets/playback_control_widget.dart';

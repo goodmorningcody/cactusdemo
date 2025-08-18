@@ -34,7 +34,7 @@ class TTSResponse {
   String get durationFormatted {
     final seconds = duration ~/ 1000;
     final milliseconds = duration % 1000;
-    return '${seconds}.${milliseconds.toString().padLeft(3, '0')}초';
+    return '$seconds.${milliseconds.toString().padLeft(3, '0')}초';
   }
 
   TTSResponse copyWith({

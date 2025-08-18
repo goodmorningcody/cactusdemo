@@ -38,11 +38,8 @@ class CactusTTSApp extends StatelessWidget {
           centerTitle: true,
           elevation: 2,
         ),
-        cardTheme: CardThemeData(
+        cardTheme: const CardTheme(
           elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -69,11 +66,8 @@ class CactusTTSApp extends StatelessWidget {
           centerTitle: true,
           elevation: 2,
         ),
-        cardTheme: CardThemeData(
+        cardTheme: const CardTheme(
           elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(

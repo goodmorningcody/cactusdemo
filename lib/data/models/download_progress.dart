@@ -62,7 +62,7 @@ class DownloadProgress {
     final seconds = estimatedTimeRemaining!.inSeconds % 60;
     
     if (minutes > 0) {
-      return '약 $minutes분 ${seconds}초 남음';
+      return '약 $minutes분 $seconds초 남음';
     } else {
       return '약 $seconds초 남음';
     }

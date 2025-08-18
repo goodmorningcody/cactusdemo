@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:cactus/cactus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -17,25 +17,18 @@ class CactusTTSService implements TTSServiceInterface {
   String? _modelPath;
   Map<String, dynamic> _voiceParameters = {};
   
-  // OuteTTS specific model URL
-  static const String _outeTTSModelUrl = 
-    'https://huggingface.co/OuteAI/OuteTTS-0.2-500M-GGUF/resolve/main/OuteTTS-0.2-500M-Q4_K_M.gguf';
   
   @override
   Future<void> initialize(String modelPath) async {
     try {
-      Logger.info('Initializing Cactus TTS with model: $modelPath');
+      Logger.info('Initializing Cactus TTS with bundled model');
       
-      // Check if model file exists
-      final modelFile = File(modelPath);
-      if (!await modelFile.exists()) {
-        Logger.warning('Model file not found at $modelPath, downloading...');
-        modelPath = await _downloadModel();
-      }
+      // Copy model from assets to local storage
+      final localModelPath = await _copyModelFromAssets();
       
       // Initialize Cactus TTS model
       _model = await CactusTTS.init(
-        modelUrl: 'file://$modelPath',
+        modelUrl: 'file://$localModelPath',
         contextSize: 4096, // Optimal for OuteTTS
         gpuLayers: Platform.isAndroid || Platform.isIOS ? 10 : 30,
         threads: Platform.numberOfProcessors,
@@ -44,10 +37,10 @@ class CactusTTSService implements TTSServiceInterface {
         },
       );
       
-      _modelPath = modelPath;
+      _modelPath = localModelPath;
       _isInitialized = true;
       
-      Logger.success('Cactus TTS initialized successfully');
+      Logger.success('Cactus TTS initialized successfully with bundled model');
     } catch (e) {
       Logger.error('Failed to initialize Cactus TTS: $e');
       throw Exception('Failed to initialize TTS: $e');
@@ -170,8 +163,8 @@ class CactusTTSService implements TTSServiceInterface {
     Logger.warning('Audio conversion not fully implemented - returning mock data');
     
     // Generate simple sine wave as placeholder
-    final sampleRate = 16000;
-    final duration = 1000; // 1 second
+    const sampleRate = 16000;
+    const duration = 1000; // 1 second
     final samples = sampleRate * duration ~/ 1000;
     final audioData = Uint8List(samples * 2);
     
@@ -184,10 +177,10 @@ class CactusTTSService implements TTSServiceInterface {
     return audioData;
   }
   
-  /// Download the OuteTTS model from Hugging Face
-  Future<String> _downloadModel() async {
+  /// Copy model from assets to local storage
+  Future<String> _copyModelFromAssets() async {
     try {
-      Logger.info('Downloading OuteTTS model from Hugging Face...');
+      Logger.info('Copying OuteTTS model from assets...');
       
       final appDir = await getApplicationDocumentsDirectory();
       final modelsDir = Directory(path.join(appDir.path, 'models'));
@@ -201,21 +194,35 @@ class CactusTTSService implements TTSServiceInterface {
       
       // Check if already exists
       if (await modelFile.exists()) {
-        Logger.info('Model already exists at: $modelPath');
-        return modelPath;
+        final fileSize = await modelFile.length();
+        Logger.info('Model already exists at: $modelPath ($fileSize bytes)');
+        
+        // Verify file size (should be around 350MB)
+        if (fileSize > 100000000) { // Greater than 100MB
+          return modelPath;
+        } else {
+          Logger.warning('Model file size is too small, re-copying from assets');
+          await modelFile.delete();
+        }
       }
       
-      // Download model using HTTP (Cactus will handle it during init)
-      // For now, we'll let the model download service handle this
-      throw Exception('Model not found. Please download it first.');
+      // Copy from assets
+      Logger.info('Copying model from assets to: $modelPath');
+      final assetData = await rootBundle.load('assets/models/OuteTTS-0.2-500M-Q4_K_M.gguf');
+      final bytes = assetData.buffer.asUint8List();
       
-      Logger.success('Model downloaded successfully to: $modelPath');
+      await modelFile.writeAsBytes(bytes);
+      
+      final fileSize = await modelFile.length();
+      Logger.success('Model copied successfully: $fileSize bytes');
+      
       return modelPath;
     } catch (e) {
-      Logger.error('Failed to download model: $e');
-      throw Exception('Failed to download model: $e');
+      Logger.error('Failed to copy model from assets: $e');
+      throw Exception('Failed to copy model from assets: $e');
     }
   }
+  
   
   /// Calculate audio duration from byte length and sample rate
   int _calculateDuration(int byteLength, int sampleRate) {

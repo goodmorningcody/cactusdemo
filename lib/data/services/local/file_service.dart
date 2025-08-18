@@ -71,7 +71,7 @@ class FileService {
         }
       } else if (Platform.isAndroid) {
         final dir = await getApplicationDocumentsDirectory();
-        final stat = await dir.stat();
+        await dir.stat();
         // This is a simplified approach for Android
         // In production, you might want to use platform channels for more accurate info
         return 10.0; // Default to 10GB for now
